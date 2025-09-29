@@ -347,7 +347,10 @@ Segmentation = (function($) {
             $(self.target).find(".segmentList li").each(function () {
                 curTitle = $(this).prop('title');
                 $(this).hide();
-                if (curTitle.toLowerCase().indexOf(keyword.toLowerCase()) !== -1) {
+                if (
+                  piwikHelper.normalize(curTitle).indexOf(keyword) !== -1 ||
+                  curTitle.indexOf(keyword) !== -1
+                ) {
                     $(this).show();
                 }
             });
@@ -390,7 +393,7 @@ Segmentation = (function($) {
                     // for each visible segmentationContainer -> trigger click event to close and kill scrollpane - very important !
                     closeAllOpenLists();
                     self.target.closest('.segmentEditorPanel').addClass('expanded');
-                    self.target.find('.segmentFilter').val(self.translations['General_Search']).trigger('keyup');
+                    self.target.find('.segmentFilter').val('').trigger('keyup');
                 }
             });
 
@@ -448,26 +451,11 @@ Segmentation = (function($) {
 
             // attach event that will clear segment list filtering input after clicking x
             self.target.on('click', ".segmentFilterContainer span", function (e) {
-                $(e.target).parent().find(".segmentFilter").val(self.translations['General_Search']).trigger('keyup');
-            });
-
-            self.target.on('blur', ".segmentFilter", function (e) {
-                if ($(e.target).parent().find(".segmentFilter").val() == "") {
-                    $(e.target).parent().find(".segmentFilter").val(self.translations['General_Search'])
-                }
-            });
-
-            self.target.on('click', ".segmentFilter", function (e) {
-                if ($(e.target).val() == self.translations['General_Search']) {
-                    $(e.target).val("");
-                }
+                $(e.target).parent().find('.segmentFilter').val('').trigger('keyup');
             });
 
             self.target.on('keyup', ".segmentFilter", function (e) {
                 var search = $(e.currentTarget).val();
-                if (search == self.translations['General_Search']) {
-                    search = "";
-                }
 
                 if (search.length >= 2) {
                     clearTimeout(self.filterTimer);
@@ -576,22 +564,6 @@ Segmentation = (function($) {
                 openEditForm(segment);
             }
         }
-
-        var normalizeSearchString = function(search){
-            search = search.replace(/^\s+|\s+$/g, ''); // trim
-            search = search.toLowerCase();
-            // remove accents, swap ñ for n, etc
-            var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
-            var to   = "aaaaeeeeiiiioooouuuunc------";
-            for (var i=0, l=from.length ; i<l ; i++) {
-                search = search.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
-            }
-
-            search = search.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
-                .replace(/\s+/g, '_') // collapse whitespace and replace by underscore
-                .replace(/-+/g, '-'); // collapse dashes
-            return search;
-        };
 
         // Mode = 'new' or 'edit'
         var addForm = function(mode, segment){
