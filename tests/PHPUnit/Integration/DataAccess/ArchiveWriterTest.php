@@ -58,8 +58,8 @@ class ArchiveWriterTest extends IntegrationTestCase
         $date = '2019-08-29';
 
         $initialArchiveData = [
-            ['idarchive' => 1, 'idsite' => $this->idSite, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => ArchiveWriter::DONE_PARTIAL, 'ts_archived' => '2020-02-02 03:44:44'],
-            ['idarchive' => 2, 'idsite' => $this->idSite, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => ArchiveWriter::DONE_OK, 'ts_archived' => '2020-02-04 03:44:44'],
+            ['idarchive' => 1, 'idsite' => $this->idSite, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => ArchiveWriter::DONE_PARTIAL, 'ts_started' => null, 'ts_archived' => '2020-02-02 03:44:44'],
+            ['idarchive' => 2, 'idsite' => $this->idSite, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => ArchiveWriter::DONE_OK, 'ts_started' => null, 'ts_archived' => '2020-02-04 03:44:44'],
         ];
 
         $this->insertArchiveData($initialArchiveData);
@@ -73,8 +73,8 @@ class ArchiveWriterTest extends IntegrationTestCase
         $writer->finalizeArchive();
 
         $expected = [
-            ['idarchive' => 3, 'idsite' => 1, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => 1, 'ts_archived' => '2020-04-05 03:00:00'],
-            ['idarchive' => 3, 'idsite' => 1, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'nb_visits', 'value' => 5, 'ts_archived' => '2020-04-05 03:00:00'],
+            ['idarchive' => 3, 'idsite' => 1, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => 1, 'ts_started' => '2020-04-05 03:00:00', 'ts_archived' => '2020-04-05 03:00:00'],
+            ['idarchive' => 3, 'idsite' => 1, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'nb_visits', 'value' => 5, 'ts_started' => '2020-04-05 03:00:00', 'ts_archived' => '2020-04-05 03:00:00'],
         ];
         $this->assertEquals($expected, $this->getAllColsOfAllNumericRows($date));
     }
@@ -87,8 +87,8 @@ class ArchiveWriterTest extends IntegrationTestCase
         $date = '2019-08-29';
 
         $initialArchiveData = [
-            ['idarchive' => 1, 'idsite' => $this->idSite, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => ArchiveWriter::DONE_OK, 'ts_archived' => '2020-02-02 03:44:44'],
-            ['idarchive' => 2, 'idsite' => $this->idSite, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => ArchiveWriter::DONE_PARTIAL, 'ts_archived' => '2020-02-04 03:44:44'],
+            ['idarchive' => 1, 'idsite' => $this->idSite, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => ArchiveWriter::DONE_OK, 'ts_started' => null, 'ts_archived' => '2020-02-02 03:44:44'],
+            ['idarchive' => 2, 'idsite' => $this->idSite, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => ArchiveWriter::DONE_PARTIAL, 'ts_started' => null, 'ts_archived' => '2020-02-04 03:44:44'],
         ];
 
         $this->insertArchiveData($initialArchiveData);
@@ -102,10 +102,10 @@ class ArchiveWriterTest extends IntegrationTestCase
         $writer->finalizeArchive();
 
         $expected = [
-            ['idarchive' => 1, 'idsite' => $this->idSite, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => ArchiveWriter::DONE_OK, 'ts_archived' => '2020-02-02 03:44:44'],
-            ['idarchive' => 2, 'idsite' => $this->idSite, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => ArchiveWriter::DONE_PARTIAL, 'ts_archived' => '2020-02-04 03:44:44'],
-            ['idarchive' => 3, 'idsite' => 1, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => 5, 'ts_archived' => '2020-04-05 03:00:00'],
-            ['idarchive' => 3, 'idsite' => 1, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'nb_visits', 'value' => 5, 'ts_archived' => '2020-04-05 03:00:00'],
+            ['idarchive' => 1, 'idsite' => $this->idSite, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => ArchiveWriter::DONE_OK, 'ts_started' => null, 'ts_archived' => '2020-02-02 03:44:44'],
+            ['idarchive' => 2, 'idsite' => $this->idSite, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => ArchiveWriter::DONE_PARTIAL, 'ts_started' => null, 'ts_archived' => '2020-02-04 03:44:44'],
+            ['idarchive' => 3, 'idsite' => 1, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'done', 'value' => 5, 'ts_started' => '2020-04-05 03:00:00', 'ts_archived' => '2020-04-05 03:00:00'],
+            ['idarchive' => 3, 'idsite' => 1, 'date1' => '2019-08-29', 'date2' => '2019-08-29', 'period' => 1, 'name' => 'nb_visits', 'value' => 5, 'ts_started' => '2020-04-05 03:00:00', 'ts_archived' => '2020-04-05 03:00:00'],
         ];
         $this->assertEquals($expected, $this->getAllColsOfAllNumericRows($date));
     }
@@ -229,6 +229,31 @@ class ArchiveWriterTest extends IntegrationTestCase
         }
     }
 
+    public function testRecordsStoreTsStartedWhenArchivingBegins()
+    {
+        $period = 'day';
+        $date = '2019-08-29';
+
+        Date::$now = strtotime('2020-04-05 03:00:00');
+        $writer = $this->buildWriter($period, $date);
+        $writer->initNewArchive();
+
+        Date::$now = strtotime('2020-04-05 03:05:00');
+        $writer->insertRecord('nb_visits', 5);
+
+        Date::$now = strtotime('2020-04-05 03:10:00');
+        $writer->finalizeArchive();
+
+        $rows = $this->getAllColsOfAllNumericRows($date);
+        $doneRow = $this->findRowByName($rows, 'done');
+        $metricRow = $this->findRowByName($rows, 'nb_visits');
+
+        $this->assertEquals('2020-04-05 03:00:00', $doneRow['ts_started']);
+        $this->assertEquals('2020-04-05 03:05:00', $metricRow['ts_started']);
+        $this->assertEquals('2020-04-05 03:10:00', $doneRow['ts_archived']);
+        $this->assertEquals('2020-04-05 03:10:00', $metricRow['ts_archived']);
+    }
+
     public function testHigherCompressionLevelCreatesSmallerBlobs()
     {
         $period = 'day';
@@ -301,6 +326,17 @@ class ArchiveWriterTest extends IntegrationTestCase
         $this->assertEmpty($row);
     }
 
+    private function findRowByName(array $rows, string $name): array
+    {
+        foreach ($rows as $row) {
+            if ($row['name'] === $name) {
+                return $row;
+            }
+        }
+
+        $this->fail(sprintf('Could not find archive row with name "%s"', $name));
+    }
+
     private function getAllNumericRows($date)
     {
         $archiveTableName = ArchiveTableCreator::getNumericTable(Date::factory($date));
@@ -340,10 +376,11 @@ class ArchiveWriterTest extends IntegrationTestCase
             $d = Date::factory($row['date1']);
             $table = ArchiveTableCreator::getNumericTable($d);
             $tsArchived = isset($row['ts_archived']) ? $row['ts_archived'] : Date::now()->getDatetime();
+            $tsStarted = $row['ts_started'] ?? null;
 
             Db::query(
-                "INSERT INTO `$table` (idarchive, idsite, period, date1, date2, `name`, `value`, ts_archived) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                [$row['idarchive'], $row['idsite'], $row['period'], $row['date1'], $row['date2'], $row['name'], $row['value'], $tsArchived]
+                "INSERT INTO `$table` (idarchive, idsite, period, date1, date2, `name`, `value`, ts_started, ts_archived) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [$row['idarchive'], $row['idsite'], $row['period'], $row['date1'], $row['date2'], $row['name'], $row['value'], $tsStarted, $tsArchived]
             );
         }
     }
@@ -351,7 +388,7 @@ class ArchiveWriterTest extends IntegrationTestCase
     private function getAllColsOfAllNumericRows(string $date)
     {
         $archiveTableName = ArchiveTableCreator::getNumericTable(Date::factory($date));
-        $sql = 'SELECT idarchive, idsite, date1, date2, period, name, value, ts_archived FROM ' . $archiveTableName;
+        $sql = 'SELECT idarchive, idsite, date1, date2, period, name, value, ts_started, ts_archived FROM ' . $archiveTableName;
 
         return Db::fetchAll($sql);
     }

@@ -613,8 +613,9 @@ class Model
     public function insertRecord($tableName, $fields, $record, $name, $value)
     {
         // duplicate idarchives are Ignored, see https://github.com/piwik/piwik/issues/987
+        $placeholders = '(' . implode(',', array_fill(0, count($fields), '?')) . ')';
         $query = "INSERT IGNORE INTO `$tableName` (" . implode(", ", $fields) . ")
-                  VALUES (?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " . end($fields) . " = ?";
+                  VALUES $placeholders ON DUPLICATE KEY UPDATE " . end($fields) . " = ?";
 
         $bindSql   = $record;
         $bindSql[] = $name;

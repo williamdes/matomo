@@ -78,6 +78,7 @@ class ArchiveWriter
         'date1',
         'date2',
         'period',
+        'ts_started',
         'ts_archived',
         'name',
         'value'];
@@ -270,12 +271,11 @@ class ArchiveWriter
     {
         $records = $this->recordsToWriteSpool[$valueType];
 
-        $bindSql = $this->getInsertRecordBind();
         $values  = [];
 
         $valueSeen = false;
         foreach ($records as $record) {
-            $bind     = $bindSql;
+            $bind     = $this->getInsertRecordBind($record[2]);
             $bind[]   = $record[0]; // name
             $bind[]   = $record[1]; // value
             $values[] = $bind;
@@ -311,9 +311,11 @@ class ArchiveWriter
     public function insertRecord($name, $value)
     {
         $valueType = $this->isRecordNumeric($value) ? 'numeric' : 'blob';
+        $tsStarted = Date::now()->getDatetime();
         $this->recordsToWriteSpool[$valueType][] = [
             0 => $name,
             1 => $value,
+            2 => $tsStarted,
         ];
 
         if (count($this->recordsToWriteSpool[$valueType]) >= self::MAX_SPOOL_SIZE) {
@@ -343,20 +345,23 @@ class ArchiveWriter
         if ($numRecords > 1) {
             $this->batchInsertSpool($valueType);
         } elseif ($numRecords === 1) {
-            [$name, $value] = $this->recordsToWriteSpool[$valueType][0];
+            [$name, $value, $tsStarted] = $this->recordsToWriteSpool[$valueType][0];
             $tableName = $this->getTableNameToInsert($value);
             $fields    = $this->getInsertFields();
-            $record    = $this->getInsertRecordBind();
+            $record    = $this->getInsertRecordBind($tsStarted);
 
             $this->getModel()->insertRecord($tableName, $fields, $record, $name, $value);
         }
         $this->recordsToWriteSpool[$valueType] = [];
     }
 
-    protected function getInsertRecordBind()
+    protected function getInsertRecordBind($tsStarted)
     {
         $now = Date::now()->getDatetime();
-        if (empty($this->earliestNow)) {
+        if (empty($tsStarted)) {
+            $tsStarted = $now;
+        }
+        if (empty($this->earliestNow) || $now < $this->earliestNow) {
             $this->earliestNow = $now;
         }
         return [$this->getIdArchive(),
@@ -364,6 +369,7 @@ class ArchiveWriter
             $this->dateStart->toString('Y-m-d'),
             $this->period->getDateEnd()->toString('Y-m-d'),
             $this->period->getId(),
+            $tsStarted,
             $now];
     }
 
