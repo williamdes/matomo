@@ -16,6 +16,7 @@ class ArchiveTableCreator
 {
     public const NUMERIC_TABLE = "numeric";
     public const BLOB_TABLE    = "blob";
+    public const META_DATA_TABLE = "meta_data";
 
     public static $tablesAlreadyInstalled = null;
 
@@ -27,6 +28,11 @@ class ArchiveTableCreator
     public static function getBlobTable(Date $date)
     {
         return self::getTable($date, self::BLOB_TABLE);
+    }
+
+    public static function getMetaDataTable(Date $date)
+    {
+        return self::getTable($date, self::META_DATA_TABLE);
     }
 
     protected static function getTable(Date $date, $type)
@@ -126,7 +132,7 @@ class ArchiveTableCreator
     public static function getDateFromTableName($tableName)
     {
         $tableName = Common::unprefixTable($tableName);
-        $date      = str_replace(array('archive_numeric_', 'archive_blob_'), '', $tableName);
+        $date      = str_replace(array('archive_numeric_', 'archive_blob_', 'archive_meta_data_'), '', $tableName);
 
         return $date;
     }
@@ -144,6 +150,10 @@ class ArchiveTableCreator
 
         if (strpos($tableName, 'archive_blob_') !== false) {
             return self::BLOB_TABLE;
+        }
+
+        if (strpos($tableName, 'archive_meta_data_') !== false) {
+            return self::META_DATA_TABLE;
         }
 
         return false;

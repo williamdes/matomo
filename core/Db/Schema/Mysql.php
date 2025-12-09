@@ -334,6 +334,22 @@ class Mysql implements SchemaInterface
                                       ) $tableOptions
             ",
 
+            'archive_meta_data'     => "CREATE TABLE {$prefixTables}archive_meta_data (
+                                      metadataid BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                                      idsite INTEGER UNSIGNED NULL,
+                                      date1 DATE NULL,
+                                      date2 DATE NULL,
+                                      period TINYINT UNSIGNED NULL,
+                                      name VARCHAR(190) NOT NULL,
+                                      ts_started DATETIME NULL,
+                                      ts_archive DATETIME NULL,
+                                      ts_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                        PRIMARY KEY(metadataid),
+                                        INDEX index_idsite_dates_period(idsite, date1, date2, period, name(6)),
+                                        INDEX index_period_archive(period, ts_archive)
+                                      ) $tableOptions
+            ",
+
             'archive_invalidations' => "CREATE TABLE `{$prefixTables}archive_invalidations` (
                                             idinvalidation BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
                                             idarchive INTEGER UNSIGNED NULL,
@@ -516,8 +532,9 @@ class Mysql implements SchemaInterface
             // at this point we have the static list of core tables, but let's add the monthly archive tables
             $allArchiveNumeric = $db->fetchCol("SHOW TABLES LIKE '" . $prefixTables . "archive_numeric%'");
             $allArchiveBlob    = $db->fetchCol("SHOW TABLES LIKE '" . $prefixTables . "archive_blob%'");
+            $allArchiveMeta    = $db->fetchCol("SHOW TABLES LIKE '" . $prefixTables . "archive_meta_data%'");
 
-            $allTablesReallyInstalled = array_merge($tablesInstalled, $allArchiveNumeric, $allArchiveBlob);
+            $allTablesReallyInstalled = array_merge($tablesInstalled, $allArchiveNumeric, $allArchiveBlob, $allArchiveMeta);
 
             $allTablesReallyInstalled = array_unique($allTablesReallyInstalled);
 
@@ -604,6 +621,7 @@ class Mysql implements SchemaInterface
         $tablesToCreate = $this->getTablesCreateSql();
         unset($tablesToCreate['archive_blob']);
         unset($tablesToCreate['archive_numeric']);
+        unset($tablesToCreate['archive_meta_data']);
 
         foreach ($tablesToCreate as $tableName => $tableSql) {
             $tableName = $prefixTables . $tableName;

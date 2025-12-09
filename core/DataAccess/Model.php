@@ -563,12 +563,46 @@ class Model
         }
     }
 
+    public function insertArchiveMetaDataStart($tableName, $idSite, $date1, $date2, $period, $name, $tsStarted)
+    {
+        Db::query(
+            "INSERT INTO `$tableName` (idsite, date1, date2, period, name, ts_started, ts_archive) VALUES (?, ?, ?, ?, ?, ?, NULL)",
+            [$idSite, $date1, $date2, $period, $name, $tsStarted]
+        );
+
+        return (int) Db::get()->lastInsertId();
+    }
+
+    public function markArchiveMetaDataFinished($tableName, $metadataId, $tsArchive)
+    {
+        Db::query(
+            "UPDATE `$tableName` SET ts_archive = ? WHERE metadataid = ?",
+            [$tsArchive, $metadataId]
+        );
+    }
+
+    public function purgeArchiveMetaDataOlderThan(Date $deleteBefore)
+    {
+        $tables = ArchiveTableCreator::getTablesArchivesInstalled(ArchiveTableCreator::META_DATA_TABLE);
+
+        if (empty($tables)) {
+            return;
+        }
+
+        $cutoff = $deleteBefore->getDatetime();
+
+        foreach ($tables as $table) {
+            Db::query(sprintf('DELETE FROM `%s` WHERE ts_created < ?', $table), [$cutoff]);
+        }
+    }
+
     public function getInstalledArchiveTables()
     {
         $allArchiveNumeric = Db::get()->fetchCol("SHOW TABLES LIKE '" . Common::prefixTable('archive_numeric%') . "'");
         $allArchiveBlob    = Db::get()->fetchCol("SHOW TABLES LIKE '" . Common::prefixTable('archive_blob%') . "'");
+        $allArchiveMeta    = Db::get()->fetchCol("SHOW TABLES LIKE '" . Common::prefixTable('archive_meta_data%') . "'");
 
-        return array_merge($allArchiveBlob, $allArchiveNumeric);
+        return array_merge($allArchiveBlob, $allArchiveNumeric, $allArchiveMeta);
     }
 
     public function allocateNewArchiveId($numericTable)

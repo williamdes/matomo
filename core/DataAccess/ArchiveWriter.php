@@ -130,6 +130,11 @@ class ArchiveWriter
     private $dateStart;
 
     /**
+     * @var int|null
+     */
+    private $metaDataId;
+
+    /**
      * ArchiveWriter constructor.
      * @param ArchiveProcessor\Parameters $params
      * @throws Exception
@@ -141,6 +146,7 @@ class ArchiveWriter
         $this->segment   = $params->getSegment();
         $this->period    = $params->getPeriod();
         $this->parameters = $params;
+        $this->metaDataId = null;
 
         $idSites = [$this->idSite];
         $this->doneFlag = Rules::getDoneStringFlagFor($idSites, $this->segment, $this->period->getLabel(), $params->getRequestedPlugin());
@@ -192,6 +198,7 @@ class ArchiveWriter
     {
         $idArchive = $this->allocateNewArchiveId();
         $this->logArchiveStatusAsIncomplete();
+        $this->logArchiveMetaDataStart();
         return $idArchive;
     }
 
@@ -203,6 +210,7 @@ class ArchiveWriter
             && $this->recordsToWriteSpool['numeric'][0][0] === $this->doneFlag
             && $this->parameters->isPartialArchive()
         ) {
+            $this->logArchiveMetaDataFinished();
             // This part avoids writing done flags for empty partial archives:
             // We skip writing the records to the database if there aren't any blob records to write,
             // the only available numeric record to write would be the done flag and the archive would only be partial
@@ -225,6 +233,8 @@ class ArchiveWriter
         }
 
         $this->getModel()->updateArchiveStatus($numericTable, $idArchive, $this->doneFlag, $doneValue);
+
+        $this->logArchiveMetaDataFinished();
 
         if (
             !$this->parameters->isPartialArchive()
@@ -259,6 +269,34 @@ class ArchiveWriter
     private function getModel()
     {
         return new Model();
+    }
+
+    private function logArchiveMetaDataStart()
+    {
+        $table = $this->getTableMetaData();
+        $now = Date::now()->getDatetime();
+
+        $this->metaDataId = $this->getModel()->insertArchiveMetaDataStart(
+            $table,
+            $this->idSite,
+            $this->dateStart->toString('Y-m-d'),
+            $this->period->getDateEnd()->toString('Y-m-d'),
+            $this->period->getId(),
+            $this->doneFlag,
+            $now
+        );
+    }
+
+    private function logArchiveMetaDataFinished()
+    {
+        if (empty($this->metaDataId)) {
+            return;
+        }
+
+        $table = $this->getTableMetaData();
+        $now = Date::now()->getDatetime();
+
+        $this->getModel()->markArchiveMetaDataFinished($table, $this->metaDataId, $now);
     }
 
     protected function logArchiveStatusAsIncomplete()
@@ -379,6 +417,11 @@ class ArchiveWriter
     protected function getTableNumeric()
     {
         return ArchiveTableCreator::getNumericTable($this->dateStart);
+    }
+
+    protected function getTableMetaData()
+    {
+        return ArchiveTableCreator::getMetaDataTable($this->dateStart);
     }
 
     protected function getInsertFields()

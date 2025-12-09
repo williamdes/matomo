@@ -77,6 +77,7 @@ class Tasks extends \Piwik\Plugin\Tasks
         $this->daily('purgeInvalidatedArchives', null, self::LOW_PRIORITY);
         $this->daily('purgeBrokenArchivesCurrentMonth', null, self::LOW_PRIORITY);
         $this->daily('purgeInvalidationsForDeletedSites', null, self::LOW_PRIORITY);
+        $this->daily('purgeArchiveMetaData', null, self::LOW_PRIORITY);
 
         $this->weekly('purgeOrphanedArchives', null, self::NORMAL_PRIORITY);
 
@@ -98,6 +99,20 @@ class Tasks extends \Piwik\Plugin\Tasks
     {
         $coreModel = new CoreModel();
         $coreModel->deleteInvalidationsForDeletedSites();
+    }
+
+    public function purgeArchiveMetaData()
+    {
+        $retentionDays = (int) Config::getInstance()->General['archive_meta_data_retention_days'];
+
+        if ($retentionDays <= 0) {
+            return;
+        }
+
+        $deleteBefore = Date::factory('now')->subDay($retentionDays);
+
+        $coreModel = new CoreModel();
+        $coreModel->purgeArchiveMetaDataOlderThan($deleteBefore);
     }
 
     public function deleteOldFingerprintSalts()

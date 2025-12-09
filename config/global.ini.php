@@ -431,6 +431,9 @@ enable_sql_optimize_queries = 1
 ; you can prevent this action from happening by setting this parameter to value bigger than 1
 purge_date_range_archives_after_X_days = 1
 
+; Number of days to retain archive metadata rows before purging them. Set to 0 or a negative value to disable purging.
+archive_meta_data_retention_days = 31
+
 ; Minimum advised memory limit in Mb in php.ini file (see memory_limit value)
 ; Set to "-1" to always use the configured memory_limit value in php.ini file.
 minimum_memory_limit = 128
