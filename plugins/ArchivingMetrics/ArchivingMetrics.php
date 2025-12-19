@@ -9,6 +9,9 @@
 
 namespace Piwik\Plugins\ArchivingMetrics;
 
+use Piwik\Period;
+use Piwik\Segment;
+
 class ArchivingMetrics extends \Piwik\Plugin
 {
     public function registerEvents()
@@ -19,7 +22,7 @@ class ArchivingMetrics extends \Piwik\Plugin
         ];
     }
 
-    public function onArchiveReportsStart(int $idSite, $period, $segment, string $plugin, bool $isArchivePhpTriggered): void
+    public function onArchiveReportsStart(int $idSite, Period $period, Segment $segment, string $plugin, bool $isArchivePhpTriggered): void
     {
         $timer = Timer::getInstance($isArchivePhpTriggered);
         $context = $this->buildContext($idSite, $period, $segment, $plugin);
@@ -27,10 +30,13 @@ class ArchivingMetrics extends \Piwik\Plugin
         $timer->start($context);
     }
 
+    /**
+     * @param int[] $idArchives
+     */
     public function onArchiveReportsComplete(
         int $idSite,
-        $period,
-        $segment,
+        Period $period,
+        Segment $segment,
         string $plugin,
         bool $isArchivePhpTriggered,
         array $idArchives,
@@ -42,7 +48,7 @@ class ArchivingMetrics extends \Piwik\Plugin
         $timer->complete($context, $idArchives, $wasCached);
     }
 
-    private function buildContext(int $idSite, $period, $segment, string $plugin): Context
+    private function buildContext(int $idSite, Period $period, Segment $segment, string $plugin): Context
     {
         return new Context($idSite, $period, $segment, $plugin);
     }
