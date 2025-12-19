@@ -15,7 +15,7 @@ use Piwik\Updates as PiwikUpdates;
 use Piwik\Updater\Migration;
 
 /**
- * Update for version 5.7.0-b1
+ * Update for version 5.7.0-b2
  */
 class Updates_5_7_0_b2 extends PiwikUpdates
 {
@@ -51,6 +51,7 @@ class Updates_5_7_0_b2 extends PiwikUpdates
             ], ['metadataid']),
             $this->migration->db->addIndex('archiving_metrics', ['idarchive'], 'idx_archiving_metrics_idarchive'),
             $this->migration->db->addIndex('archiving_metrics', ['idsite', 'date1', 'period'], 'idx_archiving_metrics_site_date_period'),
+            $this->migration->db->addIndex('archiving_metrics', ['ts_started'], 'idx_archiving_metrics_ts_started'),
         ];
     }
 
