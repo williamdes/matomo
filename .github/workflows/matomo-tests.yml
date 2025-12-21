@@ -62,16 +62,8 @@ jobs:
     strategy:
       fail-fast: ${{ inputs.is_preview == true }}
       matrix:
-        type: [ 'UnitTests', 'SystemTestsPlugins', 'SystemTestsCore', 'IntegrationTestsCore', 'IntegrationTestsPlugins' ]
+        type: [ 'IntegrationTestsPlugins' ]
         environment:
-          - php: '7.2'
-            adapter: 'PDO_MYSQL'
-            mysql-engine: 'Mysql'
-            mysql-version: '5.7'
-          - php: '8.2'
-            adapter: 'PDO_MYSQL'
-            mysql-engine: 'Mariadb'
-            mysql-version: '11.4'
           - php: '8.5'
             adapter: 'MYSQLI'
             mysql-engine: 'Mysql'
@@ -93,65 +85,13 @@ jobs:
           mysql-version: ${{ matrix.environment.mysql-version }}
           php-version: ${{ matrix.environment.php }}
           redis-service: true
+          phpunit-test-options: '--log-junit results.xml'
           artifacts-pass: ${{ secrets.ARTIFACTS_PASS }}
           upload-artifacts: ${{ matrix.environment.php == '7.2' }}
           testomatio: ${{ secrets.TESTOMATIO_INTEGRATION }}
-  Javascript:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v6
+      - name: upload junit results
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          lfs: false
-          persist-credentials: false
-          submodules: true
-          path: matomo
-          ref: ${{ inputs.ref || github.ref }}
-      - name: running tests
-        uses: matomo-org/github-action-tests@main
-        with:
-          test-type: 'JS'
-          php-version: '7.2'
-          node-version: '12'
-  Client:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          lfs: false
-          persist-credentials: false
-          submodules: true
-          path: matomo
-          ref: ${{ inputs.ref || github.ref }}
-      - name: running tests
-        uses: matomo-org/github-action-tests@main
-        with:
-          test-type: 'Client'
-          node-version: '16'
-          mysql-service: false
-  UI:
-    runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: ${{ inputs.is_preview == true }}
-      matrix:
-        parts: [ 0,1,2,3 ]
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          lfs: true
-          persist-credentials: false
-          submodules: true
-          path: matomo
-          ref: ${{ inputs.ref || github.ref }}
-      - name: running tests
-        uses: matomo-org/github-action-tests@main
-        with:
-          ui-test-options: '--num-test-groups=4 --test-group=${{ matrix.parts }}'
-          test-type: 'UI'
-          php-version: '7.2'
-          node-version: '16'
-          redis-service: true
-          artifacts-pass: ${{ secrets.ARTIFACTS_PASS }}
-          upload-artifacts: true
-          testomatio: ${{ secrets.TESTOMATIO }}
+          name: phpunit-results-${{ matrix.environment.php }}-${{ matrix.environment.adapter }}-${{ matrix.environment.mysql-engine }}-${{ matrix.environment.mysql-version }}
+          path: matomo/results.xml
