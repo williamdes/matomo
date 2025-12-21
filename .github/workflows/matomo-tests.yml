@@ -64,8 +64,12 @@ jobs:
       matrix:
         type: [ 'IntegrationTestsPlugins' ]
         environment:
-          - php: '7.2'
+          - php: '8.5'
             adapter: 'PDO_MYSQL'
+            mysql-engine: 'Mysql'
+            mysql-version: '8.0'
+          - php: '8.5'
+            adapter: 'MYSQLI'
             mysql-engine: 'Mysql'
             mysql-version: '5.7'
     steps:
