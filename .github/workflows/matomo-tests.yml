@@ -64,6 +64,14 @@ jobs:
       matrix:
         type: [ 'IntegrationTestsPlugins' ]
         environment:
+          - php: '8.3'
+            adapter: 'MYSQLI'
+            mysql-engine: 'Mysql'
+            mysql-version: '8.0'
+          - php: '8.4'
+            adapter: 'MYSQLI'
+            mysql-engine: 'Mysql'
+            mysql-version: '8.0'
           - php: '8.5'
             adapter: 'MYSQLI'
             mysql-engine: 'Mysql'
