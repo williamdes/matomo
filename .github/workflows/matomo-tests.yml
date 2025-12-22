@@ -76,37 +76,6 @@ jobs:
           submodules: true
           path: matomo
           ref: ${{ inputs.ref || github.ref }}
-      - name: enable mysql slow query log
-        if: ${{ matrix.environment.mysql-engine == 'Mysql' || matrix.environment.mysql-engine == 'Mariadb' }}
-        shell: bash
-        run: |
-          set +e
-          mysql -h127.0.0.1 -uroot -e "SET GLOBAL log_output = 'TABLE';"
-          mysql -h127.0.0.1 -uroot -e "SET GLOBAL slow_query_log = 'ON';"
-          mysql -h127.0.0.1 -uroot -e "SET GLOBAL long_query_time = 0.5;"
-          mysql -h127.0.0.1 -uroot -e "SHOW VARIABLES LIKE 'slow_query_log%';"
-          mysql -h127.0.0.1 -uroot -e "SHOW VARIABLES LIKE 'long_query_time';"
-          mysql -h127.0.0.1 -uroot -e "SHOW VARIABLES LIKE 'log_output';"
-      - name: capture mysql status before tests
-        if: ${{ matrix.environment.mysql-engine == 'Mysql' || matrix.environment.mysql-engine == 'Mariadb' }}
-        shell: bash
-        run: |
-          set +e
-          mkdir -p matomo/ci-diagnostics
-          mysql -h127.0.0.1 -uroot -e "SHOW GLOBAL STATUS" > matomo/ci-diagnostics/mysql-status-before.txt
-          mysql -h127.0.0.1 -uroot -e "SHOW ENGINE INNODB STATUS\\G" > matomo/ci-diagnostics/innodb-status-before.txt
-          mysql -h127.0.0.1 -uroot -e "SHOW PROCESSLIST" > matomo/ci-diagnostics/processlist-before.txt
-      - name: capture system stats before tests
-        shell: bash
-        run: |
-          set +e
-          mkdir -p matomo/ci-diagnostics
-          echo "date: $(date -u +%FT%TZ)" > matomo/ci-diagnostics/system-before.txt
-          echo "uname: $(uname -a)" >> matomo/ci-diagnostics/system-before.txt
-          free -m >> matomo/ci-diagnostics/system-before.txt
-          df -h >> matomo/ci-diagnostics/system-before.txt
-          vmstat 1 5 >> matomo/ci-diagnostics/system-before.txt
-          ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%cpu | head -n 25 >> matomo/ci-diagnostics/system-before.txt
       - name: running tests
         uses: matomo-org/github-action-tests@disable-jit
         with:
@@ -116,6 +85,7 @@ jobs:
           mysql-version: ${{ matrix.environment.mysql-version }}
           php-version: ${{ matrix.environment.php }}
           redis-service: true
+          setup-script: matomo/.github/scripts/ci-mysql-before.sh
           phpunit-test-options: '--log-junit results.xml'
           artifacts-pass: ${{ secrets.ARTIFACTS_PASS }}
           upload-artifacts: ${{ matrix.environment.php == '7.2' }}
