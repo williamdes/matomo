@@ -81,7 +81,7 @@ jobs:
           path: matomo
           ref: ${{ inputs.ref || github.ref }}
       - name: running tests
-        uses: matomo-org/github-action-tests@main
+        uses: matomo-org/github-action-tests@disable-jit
         with:
           test-type: ${{ matrix.type }}
           mysql-driver: ${{ matrix.environment.adapter }}
