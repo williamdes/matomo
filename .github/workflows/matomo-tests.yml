@@ -85,42 +85,7 @@ jobs:
           mysql-version: ${{ matrix.environment.mysql-version }}
           php-version: ${{ matrix.environment.php }}
           redis-service: true
-          setup-script: matomo/.github/scripts/ci-mysql-before.sh
           phpunit-test-options: '--log-junit results.xml'
           artifacts-pass: ${{ secrets.ARTIFACTS_PASS }}
           upload-artifacts: ${{ matrix.environment.php == '7.2' }}
           testomatio: ${{ secrets.TESTOMATIO_INTEGRATION }}
-      - name: upload junit results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: phpunit-results-${{ matrix.environment.php }}-${{ matrix.environment.adapter }}-${{ matrix.environment.mysql-engine }}-${{ matrix.environment.mysql-version }}
-          path: matomo/results.xml
-      - name: capture mysql status after tests
-        if: always() && (matrix.environment.mysql-engine == 'Mysql' || matrix.environment.mysql-engine == 'Mariadb')
-        shell: bash
-        run: |
-          set +e
-          mkdir -p matomo/ci-diagnostics
-          mysql -h127.0.0.1 -uroot -e "SHOW GLOBAL STATUS" > matomo/ci-diagnostics/mysql-status-after.txt
-          mysql -h127.0.0.1 -uroot -e "SHOW ENGINE INNODB STATUS\\G" > matomo/ci-diagnostics/innodb-status-after.txt
-          mysql -h127.0.0.1 -uroot -e "SHOW PROCESSLIST" > matomo/ci-diagnostics/processlist-after.txt
-          mysql -h127.0.0.1 -uroot -e "SELECT * FROM mysql.slow_log ORDER BY start_time DESC LIMIT 200\\G" > matomo/ci-diagnostics/mysql-slow-log.txt
-      - name: capture system stats after tests
-        if: always()
-        shell: bash
-        run: |
-          set +e
-          mkdir -p matomo/ci-diagnostics
-          echo "date: $(date -u +%FT%TZ)" > matomo/ci-diagnostics/system-after.txt
-          echo "uname: $(uname -a)" >> matomo/ci-diagnostics/system-after.txt
-          free -m >> matomo/ci-diagnostics/system-after.txt
-          df -h >> matomo/ci-diagnostics/system-after.txt
-          vmstat 1 5 >> matomo/ci-diagnostics/system-after.txt
-          ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%cpu | head -n 25 >> matomo/ci-diagnostics/system-after.txt
-      - name: upload diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ci-diagnostics-${{ matrix.environment.php }}-${{ matrix.environment.adapter }}-${{ matrix.environment.mysql-engine }}-${{ matrix.environment.mysql-version }}
-          path: matomo/ci-diagnostics
