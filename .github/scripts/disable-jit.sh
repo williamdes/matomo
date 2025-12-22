@@ -43,4 +43,4 @@ if [[ -d "$FPM_INI_DIR" ]]; then
 fi
 
 echo "JIT settings after update:"
-php -i 2>/dev/null | awk -F'=> ' '/^opcache\\.jit =>|^opcache\\.jit_buffer_size =>|^JIT =>/{print $1 \" => \" $2}' || true
+php -i 2>/dev/null | awk -F'=> ' '/^opcache\.jit =>|^opcache\.jit_buffer_size =>|^JIT =>/{print $1 " => " $2}' || true
