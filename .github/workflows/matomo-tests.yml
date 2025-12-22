@@ -89,7 +89,6 @@ jobs:
           mysql-version: ${{ matrix.environment.mysql-version }}
           php-version: ${{ matrix.environment.php }}
           redis-service: true
-          setup-script: matomo/.github/scripts/disable-jit.sh
           phpunit-test-options: '--log-junit results.xml'
           artifacts-pass: ${{ secrets.ARTIFACTS_PASS }}
           upload-artifacts: ${{ matrix.environment.php == '7.2' }}
