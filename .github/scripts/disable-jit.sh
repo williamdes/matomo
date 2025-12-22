@@ -10,7 +10,12 @@ JIT_INI_CONTENT=$'opcache.jit=0\nopcache.jit_buffer_size=0\n'
 
 echo "Disabling JIT for PHP ${PHP_VERSION}."
 
-CLI_INI_PATH="$(php -i | awk -F'=> ' '/Loaded Configuration File/{print $2; exit}' | xargs)"
+if ! command -v php >/dev/null 2>&1; then
+  echo "php binary not found; skipping JIT disable."
+  exit 0
+fi
+
+CLI_INI_PATH="$(php -i 2>/dev/null | awk -F'=> ' '/Loaded Configuration File/{print $2; exit}' | xargs || true)"
 if [[ -n "$CLI_INI_PATH" && -f "$CLI_INI_PATH" ]]; then
   sudo cp "$CLI_INI_PATH" "${CLI_INI_PATH}.bak"
   sudo sed -i -E 's/^[; ]*opcache\\.jit\\s*=.*/opcache.jit=0/' "$CLI_INI_PATH"
@@ -38,4 +43,4 @@ if [[ -d "$FPM_INI_DIR" ]]; then
 fi
 
 echo "JIT settings after update:"
-php -i | awk -F'=> ' '/^opcache\\.jit =>|^opcache\\.jit_buffer_size =>|^JIT =>/{print $1 \" => \" $2}' || true
+php -i 2>/dev/null | awk -F'=> ' '/^opcache\\.jit =>|^opcache\\.jit_buffer_size =>|^JIT =>/{print $1 \" => \" $2}' || true
