@@ -67,19 +67,19 @@ jobs:
           - php: '7.4'
             adapter: 'PDO_MYSQL'
             mysql-engine: 'Mysql'
-            mysql-version: '8.0'
+            mysql-version: '8.0.44'
           - php: '8.0'
             adapter: 'PDO_MYSQL'
             mysql-engine: 'Mysql'
-            mysql-version: '8.0'
+            mysql-version: '8.0.44'
           - php: '8.1'
             adapter: 'PDO_MYSQL'
             mysql-engine: 'Mysql'
-            mysql-version: '8.0'
+            mysql-version: '8.0.44'
           - php: '8.2'
             adapter: 'PDO_MYSQL'
             mysql-engine: 'Mysql'
-            mysql-version: '8.0'
+            mysql-version: '8.0.44'
     steps:
       - uses: actions/checkout@v6
         with:
