@@ -65,19 +65,19 @@ jobs:
         type: [ 'IntegrationTestsPlugins' ]
         environment:
           - php: '7.4'
-            adapter: 'MYSQLI'
+            adapter: 'PDO_MYSQL'
             mysql-engine: 'Mysql'
             mysql-version: '8.0'
           - php: '8.0'
-            adapter: 'MYSQLI'
+            adapter: 'PDO_MYSQL'
             mysql-engine: 'Mysql'
             mysql-version: '8.0'
           - php: '8.1'
-            adapter: 'MYSQLI'
+            adapter: 'PDO_MYSQL'
             mysql-engine: 'Mysql'
             mysql-version: '8.0'
           - php: '8.2'
-            adapter: 'MYSQLI'
+            adapter: 'PDO_MYSQL'
             mysql-engine: 'Mysql'
             mysql-version: '8.0'
     steps:
