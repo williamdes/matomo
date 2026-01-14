@@ -44,6 +44,7 @@ class BotTracking extends Plugin
             'PrivacyManager.deleteLogsOlderThan'                => 'deleteLogsOlderThan',
             'PrivacyManager.deleteDataSubjectsForDeletedSites'  => 'deleteDataSubjectsForDeletedSites',
             'Tracker.isBotRequest'                              => 'isBotRequest',
+            'Translate.getClientSideTranslationKeys'            => 'getClientSideTranslationKeys',
             'Metrics.getEvolutionUnit'                          => 'getEvolutionUnit',
             'Metrics.getDefaultMetricTranslations'              => 'addMetricTranslations',
             'Metrics.getDefaultMetricDocumentationTranslations' => 'addMetricDocumentationTranslations',
@@ -135,5 +136,19 @@ class BotTracking extends Plugin
     public function addMetricSemanticTypes(array &$types): void
     {
         $types = array_merge($types, BotMetrics::getMetricSemanticTypes());
+    }
+
+    public function getClientSideTranslationKeys(&$translationKeys)
+    {
+        $translationKeys[] = 'BotTracking_DetectingYourSite';
+        $translationKeys[] = 'BotTracking_SiteWithoutDataChooseTrackingMethod';
+        $translationKeys[] = 'BotTracking_SiteWithoutDataInstallWithX';
+        $translationKeys[] = 'BotTracking_SiteWithoutDataOtherInstallMethods';
+        $translationKeys[] = 'BotTracking_SiteWithoutDataOtherInstallMethodsIntro';
+        $translationKeys[] = 'BotTracking_SiteWithoutDataInstallWithXRecommendation';
+        $translationKeys[] = 'BotTracking_SiteWithoutDataRecommendationText';
+        $translationKeys[] = 'General_ErrorRequest';
+        $translationKeys[] = 'General_Refresh';
+        $translationKeys[] = 'Mobile_NavigationBack';
     }
 }

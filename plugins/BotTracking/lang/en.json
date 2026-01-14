@@ -33,6 +33,17 @@
         "ReportTitleBotsOverview": "AI Assistants - Bots Overview",
         "BotsOverTimeReportDocumentation": "This report charts the evolution of AI assistant activity. Click any metric to enlarge its graph and review the underlying trend.",
         "PluginDescription": "Track and analyze visits from AI bots such as ChatGPT-User and similar. This plugin helps you understand how AI-driven tools interact with your website by logging and reporting bot-triggered requests.",
-        "SegmentNotSupported": "Report does not support segmentation. The data displayed is your standard, unsegmented report data."
+        "SegmentNotSupported": "Report does not support segmentation. The data displayed is your standard, unsegmented report data.",
+        "DetectingYourSite": "Detecting your site",
+        "NoDataWordPressInstructions": "Placeholder instructions for configuring BotTracking on WordPress.",
+        "NoDataCloudflareInstructions": "Placeholder instructions for configuring BotTracking with Cloudflare.",
+        "NoDataCloudFrontInstructions": "Placeholder instructions for configuring BotTracking with CloudFront.",
+        "SiteWithoutDataChooseTrackingMethod": "Choose your AI Assistant Bots tracking method",
+        "SiteWithoutDataInstallWithX": "Install with %1$s",
+        "SiteWithoutDataInstallWithXRecommendation": "Install AI Assistant Bots tracking with %1$s (recommended for you)",
+        "SiteWithoutDataOtherInstallMethods": "Other methods to track AI Assistant Bots",
+        "SiteWithoutDataOtherInstallMethodsIntro": "We offer multiple tracking paths — pick yours to unlock data-driven success.",
+        "SiteWithoutDataRecommendationText": "We have detected %1$s on your site, so you can set up AI Assistant Bots tracking with our official %1$s integration.",
+        "StepByStepGuide": "Step-by-step guide"
     }
 }

@@ -1,0 +1,17 @@
+{% extends "dashboard.twig" %}
+
+{% block notification %}
+    {% include "@CoreHome/_notifications.twig" %}
+{% endblock %}
+
+{% set bodyId = 'site-without-data' %}
+
+{% block topcontrols %}
+    {% if not isSingleSite %}
+    {% include "@CoreHome/_siteSelectHeader.twig" %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div vue-entry="BotTracking.SiteWithoutData"></div>
+{% endblock %}

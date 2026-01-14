@@ -11,11 +11,71 @@ declare(strict_types=1);
 
 namespace Piwik\Plugins\BotTracking;
 
+use Piwik\DataTable\Renderer\Json;
 use Piwik\Piwik;
+use Piwik\Plugins\BotTracking\BotTrackingMethod\BotTrackingMethodAbstract;
+use Piwik\Plugin\Manager;
 use Piwik\Request;
+use Piwik\SiteContentDetector;
 
 class Controller extends \Piwik\Plugin\Controller
 {
+    public function siteWithoutData(): string
+    {
+        $this->checkSitePermission();
+
+        return $this->renderTemplateAs('siteWithoutData', [
+            'hideWhatIsNew' => true,
+        ], $viewType = 'basic');
+    }
+
+    public function getTrackingMethodsForSite(): string
+    {
+        $this->checkSitePermission();
+
+        $siteContentDetector   = new SiteContentDetector();
+        $trackingMethodClasses = $this->getBotTrackingMethods();
+        $detectContent         = [];
+
+        foreach ($trackingMethodClasses as $trackingMethodClass) {
+            $detectContent[] = $trackingMethodClass::getSiteContentDetectionId();
+        }
+
+        $siteContentDetector->detectContent($detectContent, $this->idSite);
+
+        $trackingMethods = [];
+
+        foreach ($trackingMethodClasses as $trackingMethodClass) {
+            $tabContent = $trackingMethodClass::renderInstructionsTab();
+
+            $contentDetectionId    = $trackingMethodClass::getSiteContentDetectionId();
+            $contentDetectionClass = $siteContentDetector->getSiteContentDetectionById($contentDetectionId);
+            $wasDetected           = $siteContentDetector->wasDetected($contentDetectionId);
+
+            if (!empty($tabContent)) {
+                $trackingMethods[] = [
+                    'id'                   => $trackingMethodClass::getId(),
+                    'name'                 => $trackingMethodClass::getName(),
+                    'content'              => $tabContent,
+                    'icon'                 => $contentDetectionClass::getIcon(),
+                    'priority'             => $trackingMethodClass::getPriority(),
+                    'wasDetected'          => $wasDetected,
+                ];
+            }
+        }
+
+        usort($trackingMethods, function ($a, $b) {
+            if ($a['wasDetected'] === $b['wasDetected']) {
+                return $a['priority'] === $b['priority'] ? 0 : ($a['priority'] < $b['priority'] ? -1 : 1);
+            }
+
+            return $a['wasDetected'] ? -1 : 1;
+        });
+
+        Json::sendHeaderJSON();
+        return json_encode(['trackingMethods' => $trackingMethods]);
+    }
+
     public function getEvolutionGraph(): ?string
     {
         $this->checkSitePermission();
@@ -60,5 +120,16 @@ class Controller extends \Piwik\Plugin\Controller
         }
 
         return $this->renderView($view);
+    }
+
+    /**
+     * @return array<class-string<BotTrackingMethodAbstract>>
+     */
+    private function getBotTrackingMethods(): array
+    {
+        return Manager::getInstance()->findMultipleComponents(
+            'BotTrackingMethod',
+            BotTrackingMethodAbstract::class
+        );
     }
 }
